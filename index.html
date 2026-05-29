@@ -246,7 +246,7 @@
         async function loadProducts() {
             const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
             if (error) {
-                console.error('Error loading products:', error);
+                console.error(error);
                 return;
             }
             products = data || [];
@@ -381,7 +381,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
         }
 
         function importCSV() {
-            alert("CSV import is ready in this version - select a file and it will import to Supabase.");
+            alert("CSV import is ready - select a file and it will import to your Supabase database.");
         }
 
         function showProductModal(product) {
