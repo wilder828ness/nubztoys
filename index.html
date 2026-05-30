@@ -72,7 +72,6 @@
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <!-- Larger hero logo - desktop only -->
                 <div class="hidden md:flex justify-center mb-8">
                     <img src="home-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 w-auto drop-shadow-2xl">
                 </div>
@@ -243,7 +242,9 @@
                     { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
                     { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
                 ];
-            } else products = data || [];
+            } else {
+                products = data || [];
+            }
             renderFeatured();
             renderInventory();
         }
@@ -292,6 +293,16 @@
             `;
             card.onclick = () => showProductModal(product);
             return card;
+        }
+
+        function filterInventory(preSelectedCategory = '') {
+            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+            let filtered = products;
+            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
+            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
+            const container = document.getElementById('inventory-grid');
+            container.innerHTML = '';
+            filtered.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function addToCart(productId) {
@@ -346,10 +357,25 @@
         }
 
         function showAdmin() {
-            const pass = prompt("Enter admin password:");
+            document.getElementById('admin-modal').classList.remove('hidden');
+            document.getElementById('admin-modal').classList.add('flex');
+            if (isAdminLoggedIn) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('admin-modal').classList.remove('flex');
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('admin-password').value;
             if (pass === "nubz2026") {
                 isAdminLoggedIn = true;
-                alert("✅ Full Admin Panel Opened!\nUse the CSV import to add your real products.");
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
             } else {
                 alert("Wrong password. Try: nubz2026");
             }
@@ -391,7 +417,7 @@
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full Supabase version with navigation fixed!', 'color:#22d3ee');
+            console.log('%c✅ Full complete code loaded with navigation!', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
