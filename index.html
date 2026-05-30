@@ -224,204 +224,241 @@
     <!-- CHECKOUT + UPSELL MODAL -->
     <div id="stripe-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6"></div>
 
-    <script>
-        // ====================== SUPABASE CONNECTION (created ONCE) ======================
-        const supabaseUrl = 'https://vdkjjyjfwfndrksruisn.supabase.co';
-        const supabaseAnonKey = 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr';
-        const supabase = Supabase.createClient(supabaseUrl, supabaseAnonKey);
+    Copy<script>
+    // ====================== SUPABASE CONNECTION ======================
+    const supabaseUrl = 'https://vdkjjyjfwfndrksruisn.supabase.co';
+    const supabaseAnonKey = 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-        let products = [];
-        let cart = [];
-        let isAdminLoggedIn = false;
+    let products = [];
+    let cart = [];
+    let isAdminLoggedIn = false;
 
-        async function loadProducts() {
-            const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.log("Using sample data until products table is created");
-                products = [
-                    { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
-                    { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
-                ];
-            } else {
-                products = data || [];
-            }
-            renderFeatured();
-            renderInventory();
+    // ====================== NAVIGATION FUNCTION ======================
+    function showPage(page) {
+        console.log('Navigating to:', page);
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const targetPage = document.getElementById(page);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            window.scrollTo(0, 0);
         }
+        if (page === 'inventory') renderInventory();
+        if (page === 'home') renderFeatured();
+    }
 
-        function showPage(page) {
-            console.log('Navigating to:', page);
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            if (page === 'inventory') renderInventory();
-            if (page === 'home') renderFeatured();
+    // ====================== PRODUCT FUNCTIONS ======================
+    async function loadProducts() {
+        const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+        if (error) {
+            console.log("Using sample data until products table is created");
+            products = [
+                { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
+                { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
+            ];
+        } else {
+            products = data || [];
         }
+        renderFeatured();
+        renderInventory();
+    }
 
-        function filterAndGoToInventory(category) {
-            showPage('inventory');
-            setTimeout(() => filterInventory(category), 100);
-        }
+    function renderFeatured() {
+        const container = document.getElementById('featured-grid');
+        if (!container) return;
+        container.innerHTML = '';
+        products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
+    }
 
-        function renderFeatured() {
-            const container = document.getElementById('featured-grid');
-            container.innerHTML = '';
-            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
-        }
+    function renderInventory() {
+        const container = document.getElementById('inventory-grid');
+        if (!container) return;
+        container.innerHTML = '';
+        products.forEach(product => container.appendChild(createProductCard(product)));
+    }
 
-        function renderInventory() {
-            const container = document.getElementById('inventory-grid');
-            container.innerHTML = '';
-            products.forEach(product => container.appendChild(createProductCard(product)));
-        }
-
-        function createProductCard(product) {
-            const card = document.createElement('div');
-            card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
-            let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
-            card.innerHTML = `
-                <div class="relative">
-                    <img src="${product.image}" class="w-full h-56 object-cover">
-                    <div class="absolute top-4 right-4">${statusHTML}</div>
+    function createProductCard(product) {
+        const card = document.createElement('div');
+        card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
+        let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+        card.innerHTML = `
+            <div class="relative">
+                <img src="${product.image}" class="w-full h-56 object-cover">
+                <div class="absolute top-4 right-4">${statusHTML}</div>
+            </div>
+            <div class="p-6">
+                <div class="font-semibold text-lg">${product.name}</div>
+                <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
+                <div class="flex justify-between items-center mt-4">
+                    <div class="text-3xl font-bold">$${product.price}</div>
+                    <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
                 </div>
-                <div class="p-6">
-                    <div class="font-semibold text-lg">${product.name}</div>
-                    <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
-                    <div class="flex justify-between items-center mt-4">
-                        <div class="text-3xl font-bold">$${product.price}</div>
-                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
-                    </div>
-                </div>
-            `;
-            card.onclick = () => showProductModal(product);
-            return card;
-        }
+            </div>
+        `;
+        card.onclick = () => showProductModal(product);
+        return card;
+    }
 
-        function filterInventory(preSelectedCategory = '') {
-            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
-            let filtered = products;
-            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
-            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
-            const container = document.getElementById('inventory-grid');
-            container.innerHTML = '';
-            filtered.forEach(product => container.appendChild(createProductCard(product)));
-        }
+    function filterAndGoToInventory(category) {
+        showPage('inventory');
+        setTimeout(() => filterInventory(category), 100);
+    }
 
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-            const existing = cart.find(item => item.id === productId);
-            if (existing) existing.quantity++;
-            else cart.push({...product, quantity: 1});
-            updateCartCount();
-        }
+    function filterInventory(preSelectedCategory = '') {
+        const searchInput = document.getElementById('search-input');
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
+        let filtered = products;
+        if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
+        if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
+        const container = document.getElementById('inventory-grid');
+        if (!container) return;
+        container.innerHTML = '';
+        filtered.forEach(product => container.appendChild(createProductCard(product)));
+    }
 
-        function updateCartCount() {
-            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cart-count').textContent = count;
-        }
+    // ====================== CART FUNCTIONS ======================
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        const existing = cart.find(item => item.id === productId);
+        if (existing) existing.quantity++;
+        else cart.push({...product, quantity: 1});
+        updateCartCount();
+    }
 
-        function showCart() {
-            if (cart.length === 0) return alert("Your cart is empty!");
-            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            showStripeCheckout(total);
-        }
+    function updateCartCount() {
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const cartCountEl = document.getElementById('cart-count');
+        if (cartCountEl) cartCountEl.textContent = count;
+    }
 
-        function showStripeCheckout(total) {
-            const modalHTML = `
-                <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-[120]">
-                    <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4">
-                        <h3 class="text-2xl font-bold mb-2">Checkout</h3>
-                        <p class="text-yellow-400 mb-6">TEST MODE</p>
-                        <div class="flex justify-between text-xl mb-6"><span>Total</span><span class="font-bold">$${total}</span></div>
-                        <h4 class="font-semibold mb-4">Add-ons customers also bought:</h4>
-                        <div class="space-y-3 mb-8">
-                            <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
-                                <span>Blind Bag Mystery ($8)</span>
-                                <button onclick="addToCart(99); this.innerHTML='Added!'" class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">+ $8</button>
-                            </div>
+    function showCart() {
+        if (cart.length === 0) return alert("Your cart is empty!");
+        let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        showStripeCheckout(total);
+    }
+
+    function showStripeCheckout(total) {
+        const modalHTML = `
+            <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-[120]">
+                <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4">
+                    <h3 class="text-2xl font-bold mb-2">Checkout</h3>
+                    <p class="text-yellow-400 mb-6">TEST MODE</p>
+                    <div class="flex justify-between text-xl mb-6"><span>Total</span><span class="font-bold">$${total}</span></div>
+                    <h4 class="font-semibold mb-4">Add-ons customers also bought:</h4>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+                            <span>Blind Bag Mystery ($8)</span>
+                            <button onclick="addToCart(99); this.innerHTML='Added!'" class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">+ $8</button>
                         </div>
-                        <button onclick="completeOrder(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order</button>
-                        <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
                     </div>
-                </div>`;
-            const temp = document.createElement('div');
-            temp.innerHTML = modalHTML;
-            document.body.appendChild(temp.firstElementChild);
-        }
+                    <button onclick="completeOrder(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order</button>
+                    <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
+                </div>
+            </div>`;
+        const temp = document.createElement('div');
+        temp.innerHTML = modalHTML;
+        document.body.appendChild(temp.firstElementChild);
+    }
 
-        function completeOrder(total) {
-            document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
-            alert(`✅ Order complete!\nTotal: $${total}\n\n📧 Email notification sent to shipping@wildernessdealz.com`);
-            cart = [];
-            updateCartCount();
-            showPage('home');
-        }
+    function completeOrder(total) {
+        document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
+        alert(`✅ Order complete!\nTotal: $${total}\n\n📧 Email notification sent to shipping@wildernessdealz.com`);
+        cart = [];
+        updateCartCount();
+        showPage('home');
+    }
 
-        function showAdmin() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-            document.getElementById('admin-modal').classList.add('flex');
+    // ====================== ADMIN FUNCTIONS ======================
+    function showAdmin() {
+        const modal = document.getElementById('admin-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             if (isAdminLoggedIn) {
                 document.getElementById('admin-login').classList.add('hidden');
                 document.getElementById('admin-panel').classList.remove('hidden');
             }
         }
+    }
 
-        function closeAdmin() {
-            document.getElementById('admin-modal').classList.add('hidden');
-            document.getElementById('admin-modal').classList.remove('flex');
+    function closeAdmin() {
+        const modal = document.getElementById('admin-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
+    }
 
-        function loginAdmin() {
-            const pass = document.getElementById('admin-password').value;
-            if (pass === "nubz2026") {
-                isAdminLoggedIn = true;
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-            } else {
-                alert("Wrong password. Try: nubz2026");
-            }
+    function loginAdmin() {
+        const pass = document.getElementById('admin-password').value;
+        if (pass === "nubz2026") {
+            isAdminLoggedIn = true;
+            document.getElementById('admin-login').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+        } else {
+            alert("Wrong password. Try: nubz2026");
         }
+    }
 
-        function downloadSampleCSV() {
-            const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL\nFunko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man Funko Pop figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400`;
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'nubz-sample-products.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
+    function downloadSampleCSV() {
+        const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL\nFunko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man Funko Pop figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400`;
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'nubz-sample-products.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function importCSV() {
+        alert("CSV import ready for Supabase (table will be created next step)");
+    }
+
+    // ====================== MODAL FUNCTIONS ======================
+    function showProductModal(product) {
+        alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
+    }
+
+    function showPrivacy() {
+        alert("Privacy Policy\n\nYour privacy is important to us.");
+    }
+
+    function showTerms() {
+        alert("Terms & Conditions\n\nPlease review our terms before purchasing.");
+    }
+
+    function submitContactForm() {
+        alert("Message sent!");
+    }
+
+    // ====================== MOBILE MENU ======================
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        if (menu) menu.classList.add('hidden');
+    }
+
+    function setupMobileMenu() {
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        if (btn && menu) {
+            btn.addEventListener('click', () => menu.classList.toggle('hidden'));
         }
+    }
 
-        function importCSV() {
-            alert("CSV import ready for Supabase (table will be created next step)");
-        }
+    // ====================== INITIALIZATION ======================
+    function initializeWebsite() {
+        loadProducts();
+        const homePage = document.getElementById('home');
+        if (homePage) homePage.classList.add('active');
+        updateCartCount();
+        setupMobileMenu();
+        console.log('%c✅ Website fully loaded with working navigation!', 'color:#22d3ee; font-size: 14px; font-weight: bold;');
+    }
 
-        function showProductModal(product) {
-            alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
-        }
-
-        function submitContactForm() {
-            alert("Message sent!");
-        }
-
-        function closeMobileMenu() {
-            document.getElementById('mobile-menu').classList.add('hidden');
-        }
-
-        function setupMobileMenu() {
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
-        }
-
-        function initializeWebsite() {
-            loadProducts();
-            document.getElementById('home').classList.add('active');
-            updateCartCount();
-            setupMobileMenu();
-            console.log('%c✅ Full site with Supabase + navigation fixes loaded!', 'color:#22d3ee');
-        }
-
-        window.onload = initializeWebsite;
-    </script>
+    // Run when page loads
+    window.addEventListener('DOMContentLoaded', initializeWebsite);
+</script>
 </body>
 </html>
