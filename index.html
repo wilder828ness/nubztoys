@@ -31,11 +31,11 @@
                 </div>
 
                 <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
-                    <a href="#" onclick="showPage('home')" class="nav-link">Home</a>
-                    <a href="#" onclick="showPage('categories')" class="nav-link">Categories</a>
-                    <a href="#" onclick="showPage('inventory')" class="nav-link">All Inventory</a>
-                    <a href="#" onclick="showPage('about')" class="nav-link">About Us</a>
-                    <a href="#" onclick="showPage('contact')" class="nav-link">Contact Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('home')" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories')" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory')" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about')" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
                 </div>
 
                 <button id="mobile-menu-btn" class="md:hidden text-2xl px-3">
@@ -55,12 +55,12 @@
 
             <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
                 <div class="flex flex-col gap-y-4 text-lg font-medium">
-                    <a href="#" onclick="showPage('home'); closeMobileMenu()" class="nav-link">Home</a>
-                    <a href="#" onclick="showPage('categories'); closeMobileMenu()" class="nav-link">Categories</a>
-                    <a href="#" onclick="showPage('inventory'); closeMobileMenu()" class="nav-link">All Inventory</a>
-                    <a href="#" onclick="showPage('about'); closeMobileMenu()" class="nav-link">About Us</a>
-                    <a href="#" onclick="showPage('contact'); closeMobileMenu()" class="nav-link">Contact Us</a>
-                    <button onclick="showAdmin(); closeMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                    <a href="#" onclick="event.preventDefault(); showPage('home'); closeMobileMenu()" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories'); closeMobileMenu()" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); closeMobileMenu()" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about'); closeMobileMenu()" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact'); closeMobileMenu()" class="nav-link">Contact Us</a>
+                    <button onclick="event.preventDefault(); showAdmin(); closeMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
                         <i class="fa-solid fa-user-shield"></i> Admin Panel
                     </button>
                 </div>
@@ -186,11 +186,11 @@
         <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
             <div>© 2026 Nubz Toys &amp; Collectibles. All rights reserved.</div>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
-                <a href="#" onclick="showPage('about')" class="hover:text-white">About Us</a>
-                <a href="#" onclick="showPage('contact')" class="hover:text-white">Contact Us</a>
-                <a href="#" onclick="showPrivacy()" class="hover:text-white">Privacy Policy</a>
-                <a href="#" onclick="showTerms()" class="hover:text-white">Terms &amp; Conditions</a>
-                <a href="#" onclick="showAdmin()" class="hover:text-white font-semibold">Admin Panel</a>
+                <a href="#" onclick="event.preventDefault(); showPage('about')" class="hover:text-white">About Us</a>
+                <a href="#" onclick="event.preventDefault(); showPage('contact')" class="hover:text-white">Contact Us</a>
+                <a href="#" onclick="event.preventDefault(); showPrivacy()" class="hover:text-white">Privacy Policy</a>
+                <a href="#" onclick="event.preventDefault(); showTerms()" class="hover:text-white">Terms &amp; Conditions</a>
+                <a href="#" onclick="event.preventDefault(); showAdmin()" class="hover:text-white font-semibold">Admin Panel</a>
             </div>
         </div>
     </footer>
@@ -417,7 +417,7 @@
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full complete code loaded with navigation!', 'color:#22d3ee');
+            console.log('%c✅ Full complete code with preventDefault fix loaded!', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
