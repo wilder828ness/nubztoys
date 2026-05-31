@@ -207,17 +207,17 @@
                 <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Login</button>
             </div>
 
-            <!-- ADMIN PANEL CONTENT -->
+            <!-- ADMIN CONTENT -->
             <div id="admin-panel" class="hidden">
                 
-                <!-- MANUAL ADD PRODUCT -->
+                <!-- MANUAL ADD -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input id="manual-brand" placeholder="Brand (e.g. Funko Pop)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-brand" placeholder="Brand" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-title" placeholder="Title" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-price" type="number" placeholder="Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        <input id="manual-category" placeholder="Category (Action Figures, etc.)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-category" placeholder="Category" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-status" placeholder="Status (In Stock / In Transit)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-image" placeholder="Image URL" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                     </div>
@@ -239,7 +239,7 @@
         </div>
     </div>
 
-    <!-- CHECKOUT + UPSELL MODAL -->
+    <!-- CHECKOUT MODAL -->
     <div id="stripe-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6"></div>
 
     <script>
@@ -247,7 +247,6 @@
         let cart = [];
         let isAdminLoggedIn = false;
 
-        // Supabase
         window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
@@ -414,7 +413,124 @@
             }
         }
 
-        // ====================== MANUAL ADD PRODUCT ======================
         async function addManualProduct() {
             const brand = document.getElementById('manual-brand').value.trim();
             const title = document.getElementById('manual-title').value.trim();
+            const price = parseFloat(document.getElementById('manual-price').value);
+            const category = document.getElementById('manual-category').value.trim();
+            const status = document.getElementById('manual-status').value.trim() || "In Stock";
+            const image = document.getElementById('manual-image').value.trim();
+
+            if (!title || !price) {
+                alert("Title and Price are required");
+                return;
+            }
+
+            const { error } = await window.supabase.from('products').insert([{
+                name: title,
+                brand: brand || "Unknown",
+                mainCategory: category || "Uncategorized",
+                price: price,
+                status: status,
+                image: image || "https://picsum.photos/id/106/600/400"
+            }]);
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert("Product added!");
+                document.getElementById('manual-brand').value = "";
+                document.getElementById('manual-title').value = "";
+                document.getElementById('manual-price').value = "";
+                document.getElementById('manual-category').value = "";
+                document.getElementById('manual-status').value = "";
+                document.getElementById('manual-image').value = "";
+                loadProducts();
+            }
+        }
+
+        async function importCSV() {
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('csv-result');
+            
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const csv = e.target.result;
+                const lines = csv.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                
+                let success = 0;
+                let errors = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => row[h] = values[idx] || '');
+
+                    const { error } = await window.supabase.from('products').insert([{
+                        name: row.Title || row.title || 'Untitled',
+                        brand: row.Brand || row.brand || 'Unknown',
+                        mainCategory: row.Category || row.category || 'Uncategorized',
+                        price: parseFloat(row['Sales Price'] || row.price || 0),
+                        status: row.Status || 'In Stock',
+                        image: row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400'
+                    }]);
+
+                    if (error) errors++; else success++;
+                }
+
+                resultDiv.innerHTML = `✅ Imported ${success} products. ${errors > 0 ? errors + ' errors.' : ''}`;
+                loadProducts();
+            };
+
+            reader.readAsText(file);
+        }
+
+        function downloadSampleCSV() {
+            const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL\nFunko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man Funko Pop figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400`;
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nubz-sample-products.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showProductModal(product) {
+            alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
+        }
+
+        function submitContactForm() {
+            alert("Message sent!");
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            if (btn) btn.addEventListener('click', toggleMobileMenu);
+        }
+
+        function initializeWebsite() {
+            loadProducts();
+            document.getElementById('home').classList.add('active');
+            updateCartCount();
+            setupMobileMenu();
+            console.log('%c✅ Site ready', 'color:#22d3ee');
+        }
+
+        window.onload = initializeWebsite;
+    </script>
+</body>
+</html>
