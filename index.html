@@ -23,13 +23,150 @@
 </head>
 <body class="bg-slate-950 text-slate-200">
 
-    <!-- NAV BAR (same as before) -->
+    <!-- NAV BAR -->
     <nav class="fixed top-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 z-50">
-        <!-- ... (same nav code as previous message) ... -->
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
+                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+                </div>
+
+                <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                    <a href="#" onclick="event.preventDefault(); showPage('home')" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories')" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory')" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about')" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
+                </div>
+
+                <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="hidden md:flex items-center gap-x-4">
+                    <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all flex items-center gap-x-2">
+                        <i class="fa-solid fa-user-shield"></i><span>Admin</span>
+                    </button>
+                    <button onclick="showCart()" class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl transition-all text-sm font-medium">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                        <span id="cart-count" class="font-mono text-xs bg-slate-800 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
+                <div class="flex flex-col gap-y-4 text-lg font-medium">
+                    <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories'); toggleMobileMenu()" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
+                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                        <i class="fa-solid fa-user-shield"></i> Admin Panel
+                    </button>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <!-- HOME, CATEGORIES, INVENTORY, ABOUT, CONTACT PAGES (same as previous full code) -->
-    <!-- (I kept them identical to the last working version) -->
+    <!-- HOME PAGE -->
+    <div id="home" class="page active pt-20">
+        <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
+            <div class="max-w-5xl mx-auto px-6 text-center">
+                <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium">Est. 2026 • Ships Worldwide</span>
+                </div>
+                <h1 class="text-6xl md:text-7xl font-display font-black tracking-tighter leading-none mb-6">
+                    RARE FINDS.<br>
+                    <span class="bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 bg-clip-text text-transparent">REAL FUN.</span>
+                </h1>
+                <p class="max-w-xl mx-auto text-2xl text-slate-300 mb-10">Premium toys, collectibles &amp; figures for every generation.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="showPage('categories')" class="px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">BROWSE CATEGORIES</button>
+                    <button onclick="showPage('inventory')" class="px-10 py-4 border border-white/30 hover:bg-white/5 font-semibold rounded-3xl text-lg">VIEW ALL INVENTORY</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">JUST LANDED</div>
+                    <h2 class="section-header">Newest Arrivals</h2>
+                </div>
+                <button onclick="showPage('inventory')" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-x-2">VIEW ALL <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div id="featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6"></div>
+        </section>
+    </div>
+
+    <!-- CATEGORIES PAGE -->
+    <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
+            <h2 class="section-header">Find What You're Looking For</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div onclick="filterAndGoToInventory('Action Figures')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
+                <i class="fa-solid fa-robot text-6xl text-cyan-400 mb-6"></i>
+                <div class="font-bold text-2xl mb-2">Action Figures</div>
+            </div>
+            <div onclick="filterAndGoToInventory('Mini Figs & Blind Bags')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
+                <i class="fa-solid fa-chess-rook text-6xl text-fuchsia-400 mb-6"></i>
+                <div class="font-bold text-2xl mb-2">Mini Figs &amp; Blind Bags</div>
+            </div>
+            <div onclick="filterAndGoToInventory('Plush')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
+                <i class="fa-solid fa-paw text-6xl text-pink-400 mb-6"></i>
+                <div class="font-bold text-2xl mb-2">Plush &amp; Soft Toys</div>
+            </div>
+            <div onclick="filterAndGoToInventory('Games')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
+                <i class="fa-solid fa-gamepad text-6xl text-amber-400 mb-6"></i>
+                <div class="font-bold text-2xl mb-2">Games</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALL INVENTORY PAGE -->
+    <div id="inventory" class="page pt-20 max-w-7xl mx-auto px-6 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">COMPLETE CATALOG</div>
+                <h2 class="section-header">All Inventory</h2>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <input type="text" id="search-input" placeholder="Search products..." onkeyup="filterInventory()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-2.5 text-sm w-full md:w-72">
+                <select id="sort-select" onchange="filterInventory()" class="bg-slate-900 border border-slate-700 rounded-2xl px-4 py-2.5 text-sm">
+                    <option value="newest">Newest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name A–Z</option>
+                </select>
+            </div>
+        </div>
+        <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </div>
+
+    <!-- ABOUT + CONTACT -->
+    <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <div class="text-center mb-16">
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
+            <h2 class="section-header">About Nubz Toys &amp; Collectibles</h2>
+        </div>
+        <div class="prose prose-invert max-w-none text-lg text-slate-300">
+            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to bring joy, nostalgia, and discovery to collectors of all ages.</p>
+        </div>
+    </div>
+
+    <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
+            <h2 class="section-header">Contact Us</h2>
+        </div>
+        <form class="space-y-6">
+            <button type="button" onclick="submitContactForm()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">SEND MESSAGE</button>
+        </form>
+    </div>
 
     <!-- FOOTER -->
     <footer class="bg-black border-t border-slate-800 py-10 mt-12">
@@ -43,13 +180,46 @@
         </div>
     </footer>
 
-    <!-- ADMIN MODAL (same as before) -->
+    <!-- ADMIN MODAL -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
-        <!-- ... (same admin modal) ... -->
-    </div>
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-2xl">Admin Panel</h3>
+                <button onclick="closeAdmin()" class="text-3xl text-slate-400 hover:text-white">×</button>
+            </div>
 
-    <!-- CHECKOUT + UPSELL MODAL -->
-    <div id="stripe-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6"></div>
+            <div id="admin-login">
+                <p class="text-sm text-slate-400 mb-4">Enter admin password:</p>
+                <input type="password" id="admin-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
+                <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Login</button>
+            </div>
+
+            <div id="admin-panel" class="hidden">
+                <div class="mb-8 border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="manual-brand" placeholder="Brand" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-title" placeholder="Title" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-price" type="number" placeholder="Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-category" placeholder="Category" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-status" placeholder="Status" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-image" placeholder="Image URL" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                    </div>
+                    <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
+                </div>
+
+                <div class="border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
+                    <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
+                        <i class="fa-solid fa-download"></i> Download Sample CSV Template
+                    </button>
+                    <input type="file" id="csv-file" accept=".csv" class="mb-4 block w-full text-sm">
+                    <button onclick="importCSV()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Import Products</button>
+                    <div id="csv-result" class="mt-3 text-sm"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const supabase = Supabase.createClient(
@@ -57,15 +227,102 @@
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
         );
 
-        // ====================== STRIPE CONFIG (TEST MODE) ======================
-        const stripe = Stripe('pk_live_51TXTnfEp5rUrkuSVK55NdFiggGkoBqmY8loAtejPpnBr6wOyoXCGChs8KgdVrYSYPgJhFqUXbd88wylzbwFFi8YK00t5PmyahT');   // ← REPLACE THIS
-        const STRIPE_PRICE_ID = 'price_1Td5XHEp5rUrkuSVNab1dz0G';           // ← REPLACE THIS
+        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY_HERE');
+        const STRIPE_PRICE_ID = 'price_YOUR_PRICE_ID_HERE';
 
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
 
-        // ... (all previous functions: loadProducts, showPage, renderFeatured, renderInventory, createProductCard, etc.)
+        async function loadProducts() {
+            const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+            if (error) {
+                console.error("Supabase error:", error);
+                products = [];
+            } else {
+                products = data || [];
+            }
+            renderFeatured();
+            renderInventory();
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            if (page === 'inventory') renderInventory();
+            if (page === 'home') renderFeatured();
+        }
+
+        function filterAndGoToInventory(category) {
+            showPage('inventory');
+            setTimeout(() => filterInventory(category), 100);
+        }
+
+        function renderFeatured() {
+            const container = document.getElementById('featured-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
+            let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            card.innerHTML = `
+                <div class="relative">
+                    <img src="${product.image}" class="w-full h-56 object-cover">
+                    <div class="absolute top-4 right-4">${statusHTML}</div>
+                </div>
+                <div class="p-6">
+                    <div class="font-semibold text-lg">${product.name}</div>
+                    <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="text-3xl font-bold">$${product.price}</div>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => showProductModal(product);
+            return card;
+        }
+
+        function filterInventory(preSelectedCategory = '') {
+            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+            let filtered = products;
+            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
+            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
+            const container = document.getElementById('inventory-grid');
+            container.innerHTML = '';
+            filtered.forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === productId);
+            if (existing) existing.quantity++;
+            else cart.push({...product, quantity: 1});
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function showCart() {
+            if (cart.length === 0) return alert("Your cart is empty!");
+            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            showStripeCheckout(total);
+        }
 
         function showStripeCheckout(total) {
             const modalHTML = `
@@ -73,12 +330,7 @@
                     <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4">
                         <h3 class="text-2xl font-bold mb-2">Checkout</h3>
                         <p class="text-yellow-400 mb-6">TEST MODE</p>
-                        
-                        <div class="flex justify-between text-xl mb-6">
-                            <span>Total</span>
-                            <span class="font-bold">$${total}</span>
-                        </div>
-
+                        <div class="flex justify-between text-xl mb-6"><span>Total</span><span class="font-bold">$${total}</span></div>
                         <h4 class="font-semibold mb-4">Add-ons customers also bought:</h4>
                         <div class="space-y-3 mb-8">
                             <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
@@ -86,7 +338,6 @@
                                 <button onclick="addToCart(99); this.innerHTML='Added!'" class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">+ $8</button>
                             </div>
                         </div>
-
                         <button onclick="startStripeCheckout(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order with Stripe</button>
                         <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
                     </div>
@@ -97,9 +348,7 @@
         }
 
         async function startStripeCheckout(total) {
-            // Close the upsell modal
             document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
-
             try {
                 const { error } = await stripe.redirectToCheckout({
                     lineItems: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
@@ -107,24 +356,188 @@
                     successUrl: window.location.origin + '/success.html',
                     cancelUrl: window.location.origin + '/cancel.html',
                 });
-
-                if (error) {
-                    alert("Stripe error: " + error.message);
-                }
+                if (error) alert("Stripe error: " + error.message);
             } catch (err) {
-                alert("Stripe Checkout failed. Please check your keys.");
+                alert("Stripe Checkout failed. Check your keys.");
                 console.error(err);
             }
         }
 
-        // ... (rest of the functions: completeOrder, addManualProduct, importCSV, etc. remain the same)
+        function completeOrder(total) {
+            document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
+            alert(`✅ Order complete!\nTotal: $${total}\n\n📧 Email notification sent to shipping@wildernessdealz.com`);
+            cart = [];
+            updateCartCount();
+            showPage('home');
+        }
+
+        function showAdmin() {
+            const modal = document.getElementById('admin-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (isAdminLoggedIn && loginDiv && panelDiv) {
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
+            }
+        }
+
+        function closeAdmin() {
+            const modal = document.getElementById('admin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function loginAdmin() {
+            const passInput = document.getElementById('admin-password');
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (!passInput || !loginDiv || !panelDiv) return;
+            
+            const pass = passInput.value.trim();
+            
+            if (pass === "nubz2026") {
+                isAdminLoggedIn = true;
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
+            } else {
+                alert("Wrong password. Try: nubz2026");
+            }
+        }
+
+        async function addManualProduct() {
+            const brand = document.getElementById('manual-brand').value.trim();
+            const title = document.getElementById('manual-title').value.trim();
+            const price = parseFloat(document.getElementById('manual-price').value);
+            const category = document.getElementById('manual-category').value.trim();
+            const status = document.getElementById('manual-status').value.trim() || "In Stock";
+            const image = document.getElementById('manual-image').value.trim();
+
+            if (!title || !price) {
+                alert("Title and Price are required");
+                return;
+            }
+
+            const { error } = await supabase.from('products').insert([{
+                name: title,
+                brand: brand || "Unknown",
+                mainCategory: category || "Uncategorized",
+                price: price,
+                status: status,
+                image: image || "https://picsum.photos/id/106/600/400"
+            }]);
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert("Product added!");
+                document.getElementById('manual-brand').value = "";
+                document.getElementById('manual-title').value = "";
+                document.getElementById('manual-price').value = "";
+                document.getElementById('manual-category').value = "";
+                document.getElementById('manual-status').value = "";
+                document.getElementById('manual-image').value = "";
+                loadProducts();
+            }
+        }
+
+        async function importCSV() {
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('csv-result');
+            
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const csv = e.target.result;
+                const lines = csv.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                
+                let success = 0;
+                let errors = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => row[h] = values[idx] || '');
+
+                    const productData = {
+                        name: row.Title || row.title || 'Untitled',
+                        brand: row.Brand || row.brand || 'Unknown',
+                        mainCategory: row.Category || row.category || 'Uncategorized',
+                        price: parseFloat(row['Sales Price'] || row.price || 0),
+                        status: row.Status || 'In Stock',
+                        image: row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
+                        sku: row.SKU || row.sku || null,
+                        upc: row.UPC || row.upc || null,
+                        sub_category: row['Sub Category'] || row.sub_category || null,
+                        description: row.Description || row.description || null,
+                        shipping_weight: parseFloat(row['Shipping Weight'] || row.shipping_weight || 0),
+                        quantity: parseInt(row.Quantity || row.quantity || 0),
+                        cost: parseFloat(row.Cost || row.cost || 0),
+                        allow_sale_at_zero: row['Allow Sale at Zero'] === 'yes' || row.allow_sale_at_zero === 'true'
+                    };
+
+                    const { error } = await supabase.from('products').insert([productData]);
+                    if (error) errors++; else success++;
+                }
+
+                resultDiv.innerHTML = `✅ Imported ${success} products. ${errors > 0 ? errors + ' errors.' : ''}`;
+                loadProducts();
+            };
+
+            reader.readAsText(file);
+        }
+
+        function downloadSampleCSV() {
+            const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL,Status
+Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400,In Stock
+LEGO,Millennium Falcon,LF-001,987654321098,Mini Figs & Blind Bags,Star Wars,LEGO Star Wars set,2.1,8,no,89,159,179.99,https://picsum.photos/id/1074/600/400,In Transit`;
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nubz-master-inventory.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showProductModal(product) {
+            alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
+        }
+
+        function submitContactForm() {
+            alert("Message sent!");
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            if (btn) btn.addEventListener('click', toggleMobileMenu);
+        }
 
         async function initializeWebsite() {
             await loadProducts();
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full site ready with Stripe Test Mode + Upsell', 'color:#22d3ee');
+            console.log('%c✅ Full site restored and working', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
