@@ -6,7 +6,6 @@
     <title>Nubz Toys &amp; Collectibles • Est. 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Inter', system_ui, sans-serif; }
@@ -23,52 +22,52 @@
 </head>
 <body class="bg-slate-950 text-slate-200">
 
-    <!-- NAV BAR -->
+    <!-- NAV -->
     <nav class="fixed top-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 z-50">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="flex items-center justify-between h-20">
-            <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
-                <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
+                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+                </div>
+
+                <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                    <a href="#" onclick="event.preventDefault(); showPage('home')" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories')" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory')" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about')" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
+                </div>
+
+                <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="hidden md:flex items-center gap-x-4">
+                    <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all flex items-center gap-x-2">
+                        <i class="fa-solid fa-user-shield"></i><span>Admin</span>
+                    </button>
+                    <button onclick="showCart()" class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl transition-all text-sm font-medium">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                        <span id="cart-count" class="font-mono text-xs bg-slate-800 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
-                <a href="#" onclick="event.preventDefault(); showPage('home')" class="nav-link">Home</a>
-                <a href="#" onclick="event.preventDefault(); showPage('categories')" class="nav-link">Categories</a>
-                <a href="#" onclick="event.preventDefault(); showPage('inventory')" class="nav-link">All Inventory</a>
-                <a href="#" onclick="event.preventDefault(); showPage('about')" class="nav-link">About Us</a>
-                <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
-            </div>
-
-            <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <div class="hidden md:flex items-center gap-x-4">
-                <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all flex items-center gap-x-2">
-                    <i class="fa-solid fa-user-shield"></i><span>Admin</span>
-                </button>
-                <button onclick="showCart()" class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl transition-all text-sm font-medium">
-                    <i class="fa-solid fa-shopping-bag"></i>
-                    <span id="cart-count" class="font-mono text-xs bg-slate-800 px-2 py-0.5 rounded-full">0</span>
-                </button>
+            <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
+                <div class="flex flex-col gap-y-4 text-lg font-medium">
+                    <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories'); toggleMobileMenu()" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
+                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                        <i class="fa-solid fa-user-shield"></i> Admin Panel
+                    </button>
+                </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
-            <div class="flex flex-col gap-y-4 text-lg font-medium">
-                <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
-                <a href="#" onclick="event.preventDefault(); showPage('categories'); toggleMobileMenu()" class="nav-link">Categories</a>
-                <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
-                <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
-                <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
-                <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
-                    <i class="fa-solid fa-user-shield"></i> Admin Panel
-                </button>
-            </div>
-        </div>
-    </div>
-</nav>
     <!-- HOME PAGE -->
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
@@ -222,13 +221,11 @@
     </div>
 
     <script>
+        // SINGLE Supabase declaration at the very top
         const supabase = Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
         );
-
-        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY_HERE');
-        const STRIPE_PRICE_ID = 'price_YOUR_PRICE_ID_HERE';
 
         let products = [];
         let cart = [];
@@ -338,29 +335,13 @@
                                 <button onclick="addToCart(99); this.innerHTML='Added!'" class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">+ $8</button>
                             </div>
                         </div>
-                        <button onclick="startStripeCheckout(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order with Stripe</button>
+                        <button onclick="completeOrder(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order</button>
                         <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
                     </div>
                 </div>`;
             const temp = document.createElement('div');
             temp.innerHTML = modalHTML;
             document.body.appendChild(temp.firstElementChild);
-        }
-
-        async function startStripeCheckout(total) {
-            document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
-            try {
-                const { error } = await stripe.redirectToCheckout({
-                    lineItems: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-                    mode: 'payment',
-                    successUrl: window.location.origin + '/success.html',
-                    cancelUrl: window.location.origin + '/cancel.html',
-                });
-                if (error) alert("Stripe error: " + error.message);
-            } catch (err) {
-                alert("Stripe Checkout failed. Check your keys.");
-                console.error(err);
-            }
         }
 
         function completeOrder(total) {
@@ -503,8 +484,7 @@
 
         function downloadSampleCSV() {
             const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL,Status
-Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400,In Stock
-LEGO,Millennium Falcon,LF-001,987654321098,Mini Figs & Blind Bags,Star Wars,LEGO Star Wars set,2.1,8,no,89,159,179.99,https://picsum.photos/id/1074/600/400,In Transit`;
+Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400,In Stock`;
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -537,7 +517,7 @@ LEGO,Millennium Falcon,LF-001,987654321098,Mini Figs & Blind Bags,Star Wars,LEGO
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full site restored and working', 'color:#22d3ee');
+            console.log('%c✅ Clean version loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
