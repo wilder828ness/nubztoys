@@ -72,7 +72,6 @@
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <!-- Larger hero logo removed temporarily to avoid missing file error -->
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span class="text-sm font-medium">Est. 2026 • Ships Worldwide</span>
@@ -200,13 +199,33 @@
                 <h3 class="font-bold text-2xl">Admin Panel</h3>
                 <button onclick="closeAdmin()" class="text-3xl text-slate-400 hover:text-white">×</button>
             </div>
+
+            <!-- LOGIN -->
             <div id="admin-login">
                 <p class="text-sm text-slate-400 mb-4">Enter admin password:</p>
                 <input type="password" id="admin-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
                 <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Login</button>
             </div>
+
+            <!-- ADMIN PANEL CONTENT -->
             <div id="admin-panel" class="hidden">
+                
+                <!-- MANUAL ADD PRODUCT -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="manual-brand" placeholder="Brand (e.g. Funko Pop)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-title" placeholder="Title" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-price" type="number" placeholder="Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-category" placeholder="Category (Action Figures, etc.)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-status" placeholder="Status (In Stock / In Transit)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-image" placeholder="Image URL" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                    </div>
+                    <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
+                </div>
+
+                <!-- CSV IMPORT -->
+                <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
                         <i class="fa-solid fa-download"></i> Download Sample CSV Template
@@ -215,6 +234,7 @@
                     <button onclick="importCSV()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Import Products</button>
                     <div id="csv-result" class="mt-3 text-sm"></div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -223,47 +243,30 @@
     <div id="stripe-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6"></div>
 
     <script>
-        // ====================== VARIABLES FIRST ======================
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
 
-        // ====================== SUPABASE (SAFE) ======================
-        if (typeof Supabase !== 'undefined') {
-            window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
-                'https://vdkjjyjfwfndrksruisn.supabase.co',
-                'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
-            );
-            window.supabase = window.supabaseInstance;
-        } else {
-            console.warn("Supabase CDN not loaded - running in demo mode");
-            window.supabase = null;
-        }
+        // Supabase
+        window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
+            'https://vdkjjyjfwfndrksruisn.supabase.co',
+            'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
+        );
+        window.supabase = window.supabaseInstance;
 
         async function loadProducts() {
-            if (window.supabase) {
-                const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
-                if (!error && data) {
-                    products = data;
-                } else {
-                    console.log("Using sample data");
-                    products = [
-                        { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
-                        { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
-                    ];
-                }
+            const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
+            if (error) {
+                console.log("Error loading products:", error);
+                products = [];
             } else {
-                products = [
-                    { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
-                    { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
-                ];
+                products = data || [];
             }
             renderFeatured();
             renderInventory();
         }
 
         function showPage(page) {
-            console.log('Navigating to:', page);
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
             if (page === 'inventory') renderInventory();
@@ -411,48 +414,7 @@
             }
         }
 
-        function downloadSampleCSV() {
-            const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL\nFunko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man Funko Pop figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400`;
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'nubz-sample-products.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        function importCSV() {
-            alert("CSV import ready for Supabase (table will be created next step)");
-        }
-
-        function showProductModal(product) {
-            alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
-        }
-
-        function submitContactForm() {
-            alert("Message sent!");
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
-        }
-
-        function setupMobileMenu() {
-            const btn = document.getElementById('mobile-menu-btn');
-            if (btn) btn.addEventListener('click', toggleMobileMenu);
-        }
-
-        function initializeWebsite() {
-            loadProducts();
-            document.getElementById('home').classList.add('active');
-            updateCartCount();
-            setupMobileMenu();
-            console.log('%c✅ Site ready (local testing mode)', 'color:#22d3ee');
-        }
-
-        window.onload = initializeWebsite;
-    </script>
-</body>
-</html>
+        // ====================== MANUAL ADD PRODUCT ======================
+        async function addManualProduct() {
+            const brand = document.getElementById('manual-brand').value.trim();
+            const title = document.getElementById('manual-title').value.trim();
