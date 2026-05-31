@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nubz Toys &amp; Collectibles • Est. 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Inter', system_ui, sans-serif; }
@@ -37,7 +38,7 @@
                     <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
                 </div>
 
-                <button id="mobile-menu-btn" class="md:hidden text-2xl px-3">
+                <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
@@ -54,12 +55,12 @@
 
             <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
                 <div class="flex flex-col gap-y-4 text-lg font-medium">
-                    <a href="#" onclick="event.preventDefault(); showPage('home'); closeMobileMenu()" class="nav-link">Home</a>
-                    <a href="#" onclick="event.preventDefault(); showPage('categories'); closeMobileMenu()" class="nav-link">Categories</a>
-                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); closeMobileMenu()" class="nav-link">All Inventory</a>
-                    <a href="#" onclick="event.preventDefault(); showPage('about'); closeMobileMenu()" class="nav-link">About Us</a>
-                    <a href="#" onclick="event.preventDefault(); showPage('contact'); closeMobileMenu()" class="nav-link">Contact Us</a>
-                    <button onclick="event.preventDefault(); showAdmin(); closeMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                    <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories'); toggleMobileMenu()" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
+                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
                         <i class="fa-solid fa-user-shield"></i> Admin Panel
                     </button>
                 </div>
@@ -71,9 +72,7 @@
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <div class="hidden md:flex justify-center mb-8">
-                    <img src="home-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 w-auto drop-shadow-2xl">
-                </div>
+                <!-- Larger hero logo removed temporarily to avoid missing file error -->
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span class="text-sm font-medium">Est. 2026 • Ships Worldwide</span>
@@ -224,25 +223,40 @@
     <div id="stripe-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6"></div>
 
     <script>
-        // ====================== SUPABASE CONNECTION (declared ONLY ONCE) ======================
-        const supabaseUrl = 'https://vdkjjyjfwfndrksruisn.supabase.co';
-        const supabaseAnonKey = 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr';
-        const supabase = Supabase.createClient(supabaseUrl, supabaseAnonKey);
-
+        // ====================== VARIABLES FIRST ======================
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
 
+        // ====================== SUPABASE (SAFE) ======================
+        if (typeof Supabase !== 'undefined') {
+            window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
+                'https://vdkjjyjfwfndrksruisn.supabase.co',
+                'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
+            );
+            window.supabase = window.supabaseInstance;
+        } else {
+            console.warn("Supabase CDN not loaded - running in demo mode");
+            window.supabase = null;
+        }
+
         async function loadProducts() {
-            const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.log("Using sample data until products table is created");
+            if (window.supabase) {
+                const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
+                if (!error && data) {
+                    products = data;
+                } else {
+                    console.log("Using sample data");
+                    products = [
+                        { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
+                        { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
+                    ];
+                }
+            } else {
                 products = [
                     { id: 1, name: "Spider-Man Funko Pop", mainCategory: "Action Figures", brand: "Funko Pop", price: 24, status: "In Stock", image: "https://picsum.photos/id/106/600/400" },
                     { id: 2, name: "LEGO Star Wars Millennium Falcon", mainCategory: "Mini Figs & Blind Bags", brand: "LEGO", price: 159, status: "In Transit", image: "https://picsum.photos/id/1074/600/400" }
                 ];
-            } else {
-                products = data || [];
             }
             renderFeatured();
             renderInventory();
@@ -357,25 +371,41 @@
         }
 
         function showAdmin() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-            document.getElementById('admin-modal').classList.add('flex');
-            if (isAdminLoggedIn) {
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
+            const modal = document.getElementById('admin-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (isAdminLoggedIn && loginDiv && panelDiv) {
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
             }
         }
 
         function closeAdmin() {
-            document.getElementById('admin-modal').classList.add('hidden');
-            document.getElementById('admin-modal').classList.remove('flex');
+            const modal = document.getElementById('admin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         }
 
         function loginAdmin() {
-            const pass = document.getElementById('admin-password').value;
+            const passInput = document.getElementById('admin-password');
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (!passInput || !loginDiv || !panelDiv) return;
+            
+            const pass = passInput.value.trim();
+            
             if (pass === "nubz2026") {
                 isAdminLoggedIn = true;
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
             } else {
                 alert("Wrong password. Try: nubz2026");
             }
@@ -404,12 +434,14 @@
             alert("Message sent!");
         }
 
-        function closeMobileMenu() {
-            document.getElementById('mobile-menu').classList.add('hidden');
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
         }
 
         function setupMobileMenu() {
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+            const btn = document.getElementById('mobile-menu-btn');
+            if (btn) btn.addEventListener('click', toggleMobileMenu);
         }
 
         function initializeWebsite() {
@@ -417,7 +449,7 @@
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full site with Supabase fixed + navigation working!', 'color:#22d3ee');
+            console.log('%c✅ Site ready (local testing mode)', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
