@@ -146,7 +146,7 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- ABOUT US PAGE -->
+    <!-- ABOUT + CONTACT -->
     <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
@@ -157,7 +157,6 @@
         </div>
     </div>
 
-    <!-- CONTACT US PAGE -->
     <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
@@ -195,6 +194,7 @@
             </div>
 
             <div id="admin-panel" class="hidden">
+                <!-- Manual Add -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,6 +208,7 @@
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
+                <!-- CSV Import -->
                 <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
@@ -222,7 +223,6 @@
     </div>
 
     <script>
-        // Single Supabase declaration
         const supabase = Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
@@ -473,7 +473,9 @@
                     };
 
                     const { error } = await supabase.from('products').insert([productData]);
-                    if (error) errors++; else success++;
+
+                    if (error) errors++;
+                    else success++;
                 }
 
                 resultDiv.innerHTML = `✅ Imported ${success} products. ${errors > 0 ? errors + ' errors.' : ''}`;
@@ -485,7 +487,11 @@
 
         function downloadSampleCSV() {
             const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Allow Sale at Zero,Cost,Sales Price,Compare To,Image URL,Status
-Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400,In Stock`;
+Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic Spider-Man figure,0.5,15,yes,12,24,29.99,https://picsum.photos/id/106/600/400,In Stock
+LEGO,Millennium Falcon,LF-001,987654321098,Mini Figs & Blind Bags,Star Wars,LEGO Star Wars set,2.1,8,no,89,159,179.99,https://picsum.photos/id/1074/600/400,In Transit
+Hasbro,Transformers Optimus Prime,TF-042,555666777888,Action Figures,Transformers,Leader class Optimus Prime,1.8,0,no,45,89,99.99,https://picsum.photos/id/107/600/400,Sold Out
+Mattel,Hot Wheels Track Set,HW-019,444555666777,Games,Hot Wheels,Ultimate track builder set,3.2,12,yes,28,49,59.99,https://picsum.photos/id/1080/600/400,Coming Soon`;
+
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -518,7 +524,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full clean version loaded', 'color:#22d3ee');
+            console.log('%c✅ Full professional site ready!', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
