@@ -22,7 +22,7 @@
 </head>
 <body class="bg-slate-950 text-slate-200">
 
-    <!-- NAV -->
+    <!-- NAV BAR -->
     <nav class="fixed top-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 z-50">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
@@ -146,7 +146,7 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- ABOUT + CONTACT -->
+    <!-- ABOUT US PAGE -->
     <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
@@ -157,6 +157,7 @@
         </div>
     </div>
 
+    <!-- CONTACT US PAGE -->
     <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
@@ -221,7 +222,7 @@
     </div>
 
     <script>
-        // SINGLE Supabase declaration at the very top
+        // Single Supabase declaration
         const supabase = Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
@@ -517,7 +518,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Clean version loaded', 'color:#22d3ee');
+            console.log('%c✅ Full clean version loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
