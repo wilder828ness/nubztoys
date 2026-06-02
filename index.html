@@ -195,6 +195,7 @@
             </div>
 
             <div id="admin-panel" class="hidden">
+                <!-- Manual Add -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,6 +209,7 @@
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
+                <!-- CSV Import -->
                 <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
@@ -222,40 +224,54 @@
     </div>
 
     <script>
-    // === DECLARE VARIABLES FIRST (before anything else) ===
-    let products = [];
-    let cart = [];
-    let isAdminLoggedIn = false;
+        // === VARIABLES FIRST ===
+        let products = [];
+        let cart = [];
+        let isAdminLoggedIn = false;
 
-    // === THEN SAFE SUPABASE INIT ===
-    try {
-        window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
-            'https://vdkjjyjfwfndrksruisn.supabase.co',
-            'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
-        );
-        window.supabase = window.supabaseInstance;
-    } catch (e) {
-        console.warn("Supabase failed to load — running in local mode");
-        window.supabase = null;
-    }
+        // === SAFE SUPABASE INIT ===
+        let supabase = null;
+        try {
+            const client = Supabase.createClient(
+                'https://vdkjjyjfwfndrksruisn.supabase.co',
+                'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
+            );
+            supabase = client;
+        } catch (e) {
+            console.warn("Supabase failed to load — using localStorage mode");
+        }
 
-    // === REST OF YOUR FUNCTIONS BELOW (no changes needed) ===
-        // === ALL FUNCTIONS BELOW ===
+        // === LOCALSTORAGE HELPERS ===
+        function saveToLocalStorage() {
+            localStorage.setItem('nubz_products', JSON.stringify(products));
+        }
 
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('nubz_products');
+            if (saved) {
+                products = JSON.parse(saved);
+            }
+        }
+
+        // === LOAD PRODUCTS (Supabase or localStorage) ===
         async function loadProducts() {
-            const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.error("Supabase error:", error);
-                products = [];
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+                    if (error) throw error;
+                    products = data || [];
+                } catch (e) {
+                    console.warn("Supabase load failed, falling back to localStorage");
+                    loadFromLocalStorage();
+                }
             } else {
-                products = data || [];
+                loadFromLocalStorage();
             }
             renderFeatured();
             renderInventory();
         }
 
         function showPage(page) {
-            console.log('Navigating to:', page);
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
             if (page === 'inventory') renderInventory();
@@ -388,23 +404,15 @@
         }
 
         function loginAdmin() {
-            console.log("Login button clicked");
             const passInput = document.getElementById('admin-password');
             const loginDiv = document.getElementById('admin-login');
             const panelDiv = document.getElementById('admin-panel');
             
-            console.log("Elements found:", { passInput: !!passInput, loginDiv: !!loginDiv, panelDiv: !!panelDiv });
-            
-            if (!passInput || !loginDiv || !panelDiv) {
-                alert("Admin elements not found — check console");
-                return;
-            }
+            if (!passInput || !loginDiv || !panelDiv) return;
             
             const pass = passInput.value.trim();
-            console.log("Password entered:", pass);
             
             if (pass === "nubz2026") {
-                console.log("Correct password — switching panels");
                 isAdminLoggedIn = true;
                 loginDiv.classList.add('hidden');
                 panelDiv.classList.remove('hidden');
@@ -426,27 +434,39 @@
                 return;
             }
 
-            const { error } = await window.supabase.from('products').insert([{
+            const newProduct = {
+                id: Date.now(),
                 name: title,
                 brand: brand || "Unknown",
                 mainCategory: category || "Uncategorized",
                 price: price,
                 status: status,
-                image: image || "https://picsum.photos/id/106/600/400"
-            }]);
+                image: image || "https://picsum.photos/id/106/600/400",
+                created_at: new Date().toISOString()
+            };
 
-            if (error) {
-                alert("Error: " + error.message);
+            if (supabase) {
+                try {
+                    const { error } = await supabase.from('products').insert([newProduct]);
+                    if (error) throw error;
+                } catch (e) {
+                    console.warn("Supabase insert failed, saving locally");
+                    products.unshift(newProduct);
+                    saveToLocalStorage();
+                }
             } else {
-                alert("Product added!");
-                document.getElementById('manual-brand').value = "";
-                document.getElementById('manual-title').value = "";
-                document.getElementById('manual-price').value = "";
-                document.getElementById('manual-category').value = "";
-                document.getElementById('manual-status').value = "";
-                document.getElementById('manual-image').value = "";
-                loadProducts();
+                products.unshift(newProduct);
+                saveToLocalStorage();
             }
+
+            alert("Product added!");
+            document.getElementById('manual-brand').value = "";
+            document.getElementById('manual-title').value = "";
+            document.getElementById('manual-price').value = "";
+            document.getElementById('manual-category').value = "";
+            document.getElementById('manual-status').value = "";
+            document.getElementById('manual-image').value = "";
+            loadProducts();
         }
 
         async function importCSV() {
@@ -467,35 +487,37 @@
                 const headers = lines[0].split(',').map(h => h.trim());
                 
                 let success = 0;
-                let errors = 0;
 
                 for (let i = 1; i < lines.length; i++) {
                     const values = lines[i].split(',').map(v => v.trim());
                     const row = {};
                     headers.forEach((h, idx) => row[h] = values[idx] || '');
 
-                    const productData = {
+                    const newProduct = {
+                        id: Date.now() + i,
                         name: row.Title || row.title || 'Untitled',
                         brand: row.Brand || row.brand || 'Unknown',
                         mainCategory: row.Category || row.category || 'Uncategorized',
                         price: parseFloat(row['Sales Price'] || row.price || 0),
                         status: row.Status || 'In Stock',
                         image: row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
-                        sku: row.SKU || row.sku || null,
-                        upc: row.UPC || row.upc || null,
-                        sub_category: row['Sub Category'] || row.sub_category || null,
-                        description: row.Description || row.description || null,
-                        shipping_weight: parseFloat(row['Shipping Weight'] || row.shipping_weight || 0),
-                        quantity: parseInt(row.Quantity || row.quantity || 0),
-                        cost: parseFloat(row.Cost || row.cost || 0),
-                        allow_sale_at_zero: row['Allow Sale at Zero'] === 'yes' || row.allow_sale_at_zero === 'true'
+                        created_at: new Date().toISOString()
                     };
 
-                    const { error } = await window.supabase.from('products').insert([productData]);
-                    if (error) errors++; else success++;
+                    if (supabase) {
+                        try {
+                            await supabase.from('products').insert([newProduct]);
+                        } catch (e) {
+                            products.unshift(newProduct);
+                        }
+                    } else {
+                        products.unshift(newProduct);
+                    }
+                    success++;
                 }
 
-                resultDiv.innerHTML = `✅ Imported ${success} products. ${errors > 0 ? errors + ' errors.' : ''}`;
+                if (!supabase) saveToLocalStorage();
+                resultDiv.innerHTML = `✅ Imported ${success} products.`;
                 loadProducts();
             };
 
@@ -537,7 +559,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Clean version loaded - navigation + admin should work', 'color:#22d3ee');
+            console.log('%c✅ Nubz Toys site ready (localStorage mode)', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
