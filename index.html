@@ -222,17 +222,24 @@
     </div>
 
     <script>
-        // === SAFE SUPABASE + VARIABLE DECLARATIONS AT THE VERY TOP ===
+    // === DECLARE VARIABLES FIRST (before anything else) ===
+    let products = [];
+    let cart = [];
+    let isAdminLoggedIn = false;
+
+    // === THEN SAFE SUPABASE INIT ===
+    try {
         window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
         );
         window.supabase = window.supabaseInstance;
+    } catch (e) {
+        console.warn("Supabase failed to load — running in local mode");
+        window.supabase = null;
+    }
 
-        let products = [];
-        let cart = [];
-        let isAdminLoggedIn = false;
-
+    // === REST OF YOUR FUNCTIONS BELOW (no changes needed) ===
         // === ALL FUNCTIONS BELOW ===
 
         async function loadProducts() {
