@@ -222,7 +222,7 @@
     </div>
 
     <script>
-        // SAFE Supabase initialization (prevents duplicate declaration errors)
+        // === SAFE SUPABASE + VARIABLE DECLARATIONS AT THE VERY TOP ===
         window.supabaseInstance = window.supabaseInstance || Supabase.createClient(
             'https://vdkjjyjfwfndrksruisn.supabase.co',
             'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
@@ -232,6 +232,8 @@
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
+
+        // === ALL FUNCTIONS BELOW ===
 
         async function loadProducts() {
             const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
@@ -379,15 +381,23 @@
         }
 
         function loginAdmin() {
+            console.log("Login button clicked");
             const passInput = document.getElementById('admin-password');
             const loginDiv = document.getElementById('admin-login');
             const panelDiv = document.getElementById('admin-panel');
             
-            if (!passInput || !loginDiv || !panelDiv) return;
+            console.log("Elements found:", { passInput: !!passInput, loginDiv: !!loginDiv, panelDiv: !!panelDiv });
+            
+            if (!passInput || !loginDiv || !panelDiv) {
+                alert("Admin elements not found — check console");
+                return;
+            }
             
             const pass = passInput.value.trim();
+            console.log("Password entered:", pass);
             
             if (pass === "nubz2026") {
+                console.log("Correct password — switching panels");
                 isAdminLoggedIn = true;
                 loginDiv.classList.add('hidden');
                 panelDiv.classList.remove('hidden');
@@ -520,7 +530,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             setupMobileMenu();
-            console.log('%c✅ Full clean version loaded - navigation should work', 'color:#22d3ee');
+            console.log('%c✅ Clean version loaded - navigation + admin should work', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
